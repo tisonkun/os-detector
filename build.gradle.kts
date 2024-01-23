@@ -14,16 +14,9 @@
  * limitations under the License.
  */
 
-import de.benediktritter.maven.plugin.development.task.GenerateHelpMojoSourcesTask
-import de.benediktritter.maven.plugin.development.task.GenerateMavenPluginDescriptorTask
-
 plugins {
     id("com.diffplug.spotless") version "6.24.0"
-    // @see https://www.benediktritter.de/maven-plugin-development/
-    id("de.benediktritter.maven-plugin-development") version "0.4.2"
     id("java")
-    id("maven-publish")
-    id("signing")
 }
 
 allprojects {
@@ -57,8 +50,7 @@ subprojects {
     java.targetCompatibility = JavaVersion.VERSION_1_8
 
     java {
-        withJavadocJar()
-        withSourcesJar()
+
     }
 
     dependencies {
@@ -73,98 +65,5 @@ subprojects {
 
     tasks.test {
         useJUnitPlatform()
-    }
-}
-
-project("lib") {
-    apply(plugin = "maven-publish")
-    apply(plugin = "signing")
-
-    dependencies {
-        implementation("org.slf4j:slf4j-api:1.7.36")
-        testImplementation("org.slf4j:slf4j-simple:1.7.36")
-    }
-
-    publishing {
-        publications {
-            create<MavenPublication>("mavenJava") {
-                from(components["java"])
-                pom {
-                    commonProperties()
-                    artifactId = "os-detector-core"
-                    name = "OS Detector Core"
-                    description = "Core implementations for OS detector"
-                }
-            }
-        }
-    }
-
-    signing {
-        sign(publishing.publications["mavenJava"])
-    }
-}
-
-project("plugin-maven") {
-    apply(plugin = "de.benediktritter.maven-plugin-development")
-    apply(plugin = "maven-publish")
-    apply(plugin = "signing")
-
-    mavenPlugin {
-        name = "OS Detector Maven Plugin"
-        artifactId = "os-detector-maven-plugin"
-    }
-    tasks.withType<GenerateMavenPluginDescriptorTask>().configureEach {
-        this.notCompatibleWithConfigurationCache("https://github.com/britter/maven-plugin-development/issues/8")
-    }
-    tasks.withType<GenerateHelpMojoSourcesTask>().configureEach {
-        this.notCompatibleWithConfigurationCache("https://github.com/britter/maven-plugin-development/issues/8")
-    }
-
-    dependencies {
-        compileOnly("org.apache.maven:maven-core:3.9.4")
-        compileOnly("org.apache.maven:maven-plugin-api:3.9.4")
-        compileOnly("org.apache.maven.plugin-tools:maven-plugin-annotations:3.9.0")
-        implementation(project(":lib"))
-    }
-
-    publishing {
-        publications {
-            create<MavenPublication>("mavenJava") {
-                from(components["java"])
-                pom {
-                    commonProperties()
-                    artifactId = "os-detector-maven-plugin"
-                    name = "OS Detector Maven Plugin"
-                    description = "Maven Plugin for OS detector"
-                }
-            }
-        }
-    }
-
-    signing {
-        sign(publishing.publications["mavenJava"])
-    }
-}
-
-fun MavenPom.commonProperties() {
-    licenses {
-        license {
-            name = "The Apache License, Version 2.0"
-            url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-        }
-    }
-
-    developers {
-        developer {
-            id = "tison"
-            name = "Zili Chen"
-            email = "wander4096@gmail.com"
-        }
-    }
-
-    scm {
-        connection = "scm:git:https://github.com/tisonkun/os-detector.git"
-        developerConnection = "scm:git:https://github.com/tisonkun/os-detector.git"
-        url = "https://github.com/tisonkun/os-detector/"
     }
 }
