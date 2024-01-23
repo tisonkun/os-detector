@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
+import de.benediktritter.maven.plugin.development.task.GenerateHelpMojoSourcesTask
+import de.benediktritter.maven.plugin.development.task.GenerateMavenPluginDescriptorTask
+
 plugins {
     id("com.diffplug.spotless") version "6.24.0"
+    // @see https://www.benediktritter.de/maven-plugin-development/
+    id("de.benediktritter.maven-plugin-development") version "0.4.2"
     id("java")
 }
 
@@ -23,7 +28,9 @@ allprojects {
     repositories {
         mavenCentral()
     }
+}
 
+subprojects {
     apply(plugin = "com.diffplug.spotless")
     apply(plugin = "java")
 
@@ -43,9 +50,7 @@ allprojects {
             trimTrailingWhitespace()
         }
     }
-}
 
-subprojects {
     java.sourceCompatibility = JavaVersion.VERSION_1_8
     java.targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -68,5 +73,26 @@ project("lib") {
     dependencies {
         implementation("org.slf4j:slf4j-api:1.7.36")
         testImplementation("org.slf4j:slf4j-simple:1.7.36")
+    }
+}
+
+project("plugin-maven") {
+    apply(plugin = "de.benediktritter.maven-plugin-development")
+    mavenPlugin {
+        name = "OS Detector Maven Plugin"
+        artifactId = "os-detector-maven-plugin"
+    }
+    tasks.withType<GenerateMavenPluginDescriptorTask>().configureEach {
+        this.notCompatibleWithConfigurationCache("https://github.com/britter/maven-plugin-development/issues/8")
+    }
+    tasks.withType<GenerateHelpMojoSourcesTask>().configureEach {
+        this.notCompatibleWithConfigurationCache("https://github.com/britter/maven-plugin-development/issues/8")
+    }
+
+    dependencies {
+        compileOnly("org.apache.maven:maven-core:3.9.4")
+        compileOnly("org.apache.maven:maven-plugin-api:3.9.4")
+        compileOnly("org.apache.maven.plugin-tools:maven-plugin-annotations:3.9.0")
+        implementation(project(":lib"))
     }
 }

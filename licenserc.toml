@@ -17,10 +17,13 @@ baseDir = "."
 headerPath = "Apache-2.0.txt"
 
 excludes = [
-    "DetectionException.java",
-    "Detector.java",
-    "FileOperationProvider.java",
-    "SystemPropertyOperationProvider.java",
+    "lib/src/main/java/com/tisonkun/os/core/DetectionException.java",
+    "lib/src/main/java/com/tisonkun/os/core/Detector.java",
+    "lib/src/main/java/com/tisonkun/os/core/FileOperationProvider.java",
+    "lib/src/main/java/com/tisonkun/os/core/SystemPropertyOperationProvider.java",
+    "plugin-maven/src/main/java/com/tisonkun/os/maven/DetectExtension.java",
+    "plugin-maven/src/main/java/com/tisonkun/os/maven/DetectMojo.java",
+    "plugin-maven/src/main/java/com/tisonkun/os/maven/RepositorySessionInjector.java"
 ]
 
 [properties]

@@ -16,3 +16,4 @@
 
 rootProject.name = "os-detector"
 include("lib")
+include("plugin-maven")

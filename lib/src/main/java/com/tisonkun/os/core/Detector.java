@@ -60,6 +60,10 @@ public class Detector {
     private final SystemPropertyOperationProvider systemPropertyOperationProvider;
     private final FileOperationProvider fileOperationProvider;
 
+    public Detector() {
+        this(new DefaultSystemPropertyOperations(), new DefaultFileOperations());
+    }
+
     public Detector(
             SystemPropertyOperationProvider systemPropertyOperationProvider,
             FileOperationProvider fileOperationProvider) {

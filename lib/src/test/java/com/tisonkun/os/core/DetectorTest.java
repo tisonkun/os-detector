@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 class DetectorTest {
     @Test
     void testDetectProperties() {
-        final Detector detector = new Detector(new DefaultSystemPropertyOperations(), new DefaultFileOperations());
+        final Detector detector = new Detector();
         final Properties properties = new Properties();
         detector.detect(properties, Collections.emptyList());
         assertThat(properties)
