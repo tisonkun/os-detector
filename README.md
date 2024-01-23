@@ -2,7 +2,7 @@
 
 A detector for the OS name and architecture, providing a uniform classifier to be used in the names of native artifacts.
 
-## Programmatic
+## Programmable
 
 OS detector is provided as a normal module.
 
@@ -32,7 +32,7 @@ public static void main(String[] args) {
 }
 ```
 
-It's possible to expose the `props` in a more programmatic structure (patch is welcome).
+It's possible to expose the `props` in a more programmable structure, and define the returned properties in constant enums (patch is welcome).
 
 ## Maven Extension
 
