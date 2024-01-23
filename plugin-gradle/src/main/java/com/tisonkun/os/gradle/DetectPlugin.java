@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 
-rootProject.name = "os-detector"
-include("lib")
-include("plugin-maven")
-include("plugin-gradle")
+package com.tisonkun.os.gradle;
+
+import org.gradle.api.Plugin;
+import org.gradle.api.Project;
+
+@SuppressWarnings("unused")
+public class DetectPlugin implements Plugin<Project> {
+    @Override
+    public void apply(Project project) {
+        project.getExtensions().create("osdetector", OSDetector.class, project);
+    }
+}
