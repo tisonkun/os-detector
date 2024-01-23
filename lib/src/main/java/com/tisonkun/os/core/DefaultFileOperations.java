@@ -16,16 +16,17 @@
 
 package com.tisonkun.os.core;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
- * Default implementation for {@link FileOperationProvider} based on {@link FileInputStream}.
+ * Default implementation for {@link FileOperationProvider}.
  */
 public class DefaultFileOperations implements FileOperationProvider {
     @Override
     public InputStream readFile(String filePath) throws IOException {
-        return new FileInputStream(filePath);
+        return Files.newInputStream(Paths.get(filePath));
     }
 }
