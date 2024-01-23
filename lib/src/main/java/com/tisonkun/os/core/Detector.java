@@ -31,9 +31,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class Detector {
     public static final String DETECTED_NAME = "os.detected.name";
     public static final String DETECTED_ARCH = "os.detected.arch";
@@ -59,22 +57,21 @@ public class Detector {
 
     private final SystemPropertyOperationProvider systemPropertyOperationProvider;
     private final FileOperationProvider fileOperationProvider;
-
-    public Detector() {
-        this(new DefaultSystemPropertyOperations(), new DefaultFileOperations());
-    }
+    private final LoggingProvider loggingProvider;
 
     public Detector(
             SystemPropertyOperationProvider systemPropertyOperationProvider,
-            FileOperationProvider fileOperationProvider) {
+            FileOperationProvider fileOperationProvider,
+            LoggingProvider loggingProvider) {
         this.systemPropertyOperationProvider = systemPropertyOperationProvider;
         this.fileOperationProvider = fileOperationProvider;
+        this.loggingProvider = loggingProvider;
     }
 
     public void detect(Properties props, List<String> classifierWithLikes) {
-        log.info("------------------------------------------------------------------------");
-        log.info("Detecting the operating system and CPU architecture");
-        log.info("------------------------------------------------------------------------");
+        loggingProvider.info("------------------------------------------------------------------------");
+        loggingProvider.info("Detecting the operating system and CPU architecture");
+        loggingProvider.info("------------------------------------------------------------------------");
 
         final String osName = systemPropertyOperationProvider.getSystemProperty("os.name");
         final String osArch = systemPropertyOperationProvider.getSystemProperty("os.arch");
@@ -86,7 +83,7 @@ public class Detector {
 
         setProperty(props, DETECTED_NAME, detectedName);
         setProperty(props, DETECTED_ARCH, detectedArch);
-        setProperty(props, DETECTED_BITNESS, "" + detectedBitness);
+        setProperty(props, DETECTED_BITNESS, String.valueOf(detectedBitness));
 
         final Matcher versionMatcher = VERSION_REGEX.matcher(osVersion);
         if (versionMatcher.matches()) {
@@ -142,7 +139,7 @@ public class Detector {
     private void setProperty(Properties props, String name, String value) {
         props.setProperty(name, value);
         systemPropertyOperationProvider.setSystemProperty(name, value);
-        log.info("{}: {}", name, value);
+        loggingProvider.info(name + ": " + value);
     }
 
     private static String normalizeOs(String value) {

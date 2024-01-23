@@ -16,6 +16,8 @@
 
 package com.tisonkun.os.maven;
 
+import com.tisonkun.os.core.DefaultFileOperations;
+import com.tisonkun.os.core.DefaultSystemPropertyOperations;
 import com.tisonkun.os.core.DetectionException;
 import com.tisonkun.os.core.Detector;
 import java.util.ArrayList;
@@ -62,7 +64,8 @@ public class DetectMojo extends AbstractMojo {
     @SuppressWarnings("UnusedDeclaration")
     private String classifierWithLikes;
 
-    private final Detector detector = new Detector();
+    private final Detector detector = new Detector(
+            new DefaultSystemPropertyOperations(), new DefaultFileOperations(), message -> getLog().info(message));
 
     @Override
     public void execute() throws MojoExecutionException {

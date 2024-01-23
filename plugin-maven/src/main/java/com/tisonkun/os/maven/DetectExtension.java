@@ -15,6 +15,8 @@
  */
 package com.tisonkun.os.maven;
 
+import com.tisonkun.os.core.DefaultFileOperations;
+import com.tisonkun.os.core.DefaultSystemPropertyOperations;
 import com.tisonkun.os.core.DetectionException;
 import com.tisonkun.os.core.Detector;
 import java.io.IOException;
@@ -74,7 +76,7 @@ public class DetectExtension extends AbstractMavenLifecycleParticipant {
     @Inject
     public DetectExtension(final Logger logger) {
         this.logger = logger;
-        this.detector = new Detector();
+        this.detector = new Detector(new DefaultSystemPropertyOperations(), new DefaultFileOperations(), logger::info);
     }
 
     @Override
