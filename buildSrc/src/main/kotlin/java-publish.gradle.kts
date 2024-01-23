@@ -26,41 +26,40 @@ java {
 }
 
 publishing {
-    publishing {
-        publications {
-            create<MavenPublication>("mavenJava") {
-                from(components["java"])
+    publications {
+        create<MavenPublication>("mavenJava") {
+            artifactId = project.property("artifactId").toString()
+            from(components["java"])
 
-                pom {
-                    name = project.findProperty("artifactName") as String
-                    artifactId = project.findProperty("artifactId") as String
-                    description = project.findProperty("description") as String
+            pom {
+                description = project.property("description").toString()
+                name = project.property("artifactName").toString()
+                url = "https://github.com/tisonkun/os-detector/"
 
-                    licenses {
-                        license {
-                            name = "The Apache License, Version 2.0"
-                            url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                        }
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
                     }
+                }
 
-                    developers {
-                        developer {
-                            id = "tison"
-                            name = "Zili Chen"
-                            email = "wander4096@gmail.com"
-                        }
+                developers {
+                    developer {
+                        id = "tison"
+                        name = "Zili Chen"
+                        email = "wander4096@gmail.com"
                     }
+                }
 
-                    scm {
-                        connection = "scm:git:https://github.com/tisonkun/os-detector.git"
-                        developerConnection = "scm:git:https://github.com/tisonkun/os-detector.git"
-                        url = "https://github.com/tisonkun/os-detector/"
-                    }
+                scm {
+                    connection = "scm:git:https://github.com/tisonkun/os-detector.git"
+                    developerConnection = "scm:git:https://github.com/tisonkun/os-detector.git"
+                    url = "https://github.com/tisonkun/os-detector/"
+                }
 
-                    if (artifactId == "os-detector-maven-plugin") {
-                        withXml {
-                            asNode().appendNode("prerequisites").appendNode("maven", "3.1.0")
-                        }
+                if (artifactId.equals("os-detector-maven-plugin")) {
+                    withXml {
+                        asNode().appendNode("prerequisites").appendNode("maven", "3.1.0")
                     }
                 }
             }

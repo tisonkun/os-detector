@@ -15,9 +15,10 @@
  */
 
 plugins {
-    id("groovy")
     id("com.gradle.plugin-publish") version "1.2.0"
+    id("groovy")
     id("java-gradle-plugin")
+    id("signing")
 }
 
 dependencies {
@@ -41,4 +42,43 @@ gradlePlugin {
             tags = listOf("os", "osdetector", "arch", "classifier")
         }
     }
+}
+
+publishing {
+    publications {
+        withType<MavenPublication>().configureEach {
+            artifactId = project.property("artifactId").toString()
+
+            pom {
+                description = project.property("description").toString()
+                name = project.property("artifactName").toString()
+                url = "https://github.com/tisonkun/os-detector/"
+
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = "tison"
+                        name = "Zili Chen"
+                        email = "wander4096@gmail.com"
+                    }
+                }
+
+                scm {
+                    connection = "scm:git:https://github.com/tisonkun/os-detector.git"
+                    developerConnection = "scm:git:https://github.com/tisonkun/os-detector.git"
+                    url = "https://github.com/tisonkun/os-detector/"
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign(publishing.publications)
 }

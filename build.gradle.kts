@@ -16,7 +16,19 @@
 
 plugins {
     id("com.diffplug.spotless") version "6.24.0"
+    id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
     id("java")
+}
+
+nexusPublishing {
+    repositories {
+        create("ossrh") {
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+            username = project.property("ossrhUsername").toString()
+            password = project.property("ossrhPassword").toString()
+        }
+    }
 }
 
 allprojects {
