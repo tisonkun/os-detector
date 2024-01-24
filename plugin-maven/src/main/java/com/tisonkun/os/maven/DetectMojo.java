@@ -57,11 +57,9 @@ public class DetectMojo extends AbstractMojo {
     static final String CLASSIFIER_WITH_LIKES_PROPERTY = "os.detection.classifierWithLikes";
 
     @Parameter(defaultValue = "${project}", readonly = true)
-    @SuppressWarnings("UnusedDeclaration")
     private MavenProject project;
 
     @Parameter(property = CLASSIFIER_WITH_LIKES_PROPERTY, defaultValue = "${" + CLASSIFIER_WITH_LIKES_PROPERTY + '}')
-    @SuppressWarnings("UnusedDeclaration")
     private String classifierWithLikes;
 
     private final Detector detector = new Detector(

@@ -16,13 +16,11 @@
 
 plugins {
     id("com.gradle.plugin-publish") version "1.2.0"
-    id("groovy")
     id("java-gradle-plugin")
     id("signing")
 }
 
 dependencies {
-    implementation(localGroovy())
     implementation(project(":lib"))
     implementation("javax.inject:javax.inject:1")
     implementation("org.slf4j:slf4j-api:1.7.36")
