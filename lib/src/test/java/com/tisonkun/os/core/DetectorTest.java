@@ -25,8 +25,7 @@ class DetectorTest {
     @Test
     void testDetectProperties() {
         final Properties properties = new Properties();
-        final Detector detector =
-                new Detector(new DefaultSystemPropertyOperations(), new DefaultFileOperations(), System.out::println);
+        final Detector detector = new Detector(System.out::println);
         detector.detect(properties, Collections.emptyList());
         assertThat(properties)
                 .containsKeys(
@@ -35,5 +34,16 @@ class DetectorTest {
                         "os.detected.bitness",
                         "os.detected.classifier",
                         "os.detected.version");
+    }
+
+    @Test
+    void testDetectedData() {
+        final Detector detector = new Detector(System.out::println);
+        final Detected detected = detector.detect();
+        assertThat(detected.os).isNotNull();
+        assertThat(detected.arch).isNotNull();
+        assertThat(detected.bitness).isNotZero();
+        assertThat(detected.classifier).isNotEmpty();
+        assertThat(detected.version).isNotEmpty();
     }
 }

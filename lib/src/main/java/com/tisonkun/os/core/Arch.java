@@ -16,16 +16,32 @@
 
 package com.tisonkun.os.core;
 
-import java.util.Collection;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+public enum Arch {
+    x86_64,
+    x86_32,
+    itanium_64,
+    itanium_32,
+    sparc_32,
+    sparc_64,
+    arm_32,
+    aarch_64,
+    mips_32,
+    mipsel_32,
+    mips_64,
+    mipsel_64,
+    ppc_32,
+    ppcle_32,
+    ppc_64,
+    ppcle_64,
+    s390_32,
+    s390_64,
+    riscv,
+    riscv64,
+    e2k,
+    loongarch_64,
+    unknown;
 
-@AllArgsConstructor
-@EqualsAndHashCode
-@ToString
-public class LinuxRelease {
-    public final String id;
-    public final String version;
-    public final Collection<String> like;
+    public boolean isUnknown() {
+        return this == unknown;
+    }
 }

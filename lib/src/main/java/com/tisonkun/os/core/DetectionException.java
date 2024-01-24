@@ -16,10 +16,7 @@
 
 package com.tisonkun.os.core;
 
-import java.io.Serial;
-
 public class DetectionException extends RuntimeException {
-    @Serial
     private static final long serialVersionUID = 42L;
 
     public DetectionException(String message) {

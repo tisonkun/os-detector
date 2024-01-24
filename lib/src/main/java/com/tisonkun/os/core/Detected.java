@@ -16,7 +16,6 @@
 
 package com.tisonkun.os.core;
 
-import java.util.Collection;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -24,8 +23,11 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class LinuxRelease {
-    public final String id;
+public class Detected {
+    public final int bitness;
     public final String version;
-    public final Collection<String> like;
+    public final String classifier;
+    public final OS os;
+    public final Arch arch;
+    public final LinuxRelease linuxRelease;
 }

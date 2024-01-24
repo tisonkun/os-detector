@@ -27,12 +27,23 @@ The common usage is:
 ```java
 public static void main(String[] args) {
     final Detector detector = new Detector(/* ... */);
-    final Properties props = new Properties();
-    detector.detect(props, Collections.emptyList());
+    final Detected detected = detector.detect();
 }
 ```
 
-It's possible to expose the `props` in a more programmable structure, and define the returned properties in constant enums (patch is welcome).
+... where the `Detected` structure is defined as:
+
+```java
+public class Detected {
+    public final int bitness;
+    public final String version;
+    public final String classifier;
+    public final OS os;
+    public final Arch arch;
+    @Nullable
+    public final LinuxRelease linuxRelease;
+}
+```
 
 ## Maven Extension
 
