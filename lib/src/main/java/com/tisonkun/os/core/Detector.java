@@ -53,11 +53,13 @@ public class Detector {
     private static final Pattern VERSION_REGEX = Pattern.compile("((\\d+)\\.(\\d+)).*");
     private static final Pattern REDHAT_MAJOR_VERSION_REGEX = Pattern.compile("(\\d+)");
 
-    private static final String UNKNOWN = "unknown";
-
     private final SystemPropertyOperationProvider systemPropertyOperationProvider;
     private final FileOperationProvider fileOperationProvider;
     private final LoggingProvider loggingProvider;
+
+    public Detector(LoggingProvider loggingProvider) {
+        this(new DefaultSystemPropertyOperations(), new DefaultFileOperations(), loggingProvider);
+    }
 
     public Detector(
             SystemPropertyOperationProvider systemPropertyOperationProvider,
@@ -68,39 +70,18 @@ public class Detector {
         this.loggingProvider = loggingProvider;
     }
 
-    public void detect(Properties props, List<String> classifierWithLikes) {
-        loggingProvider.info("------------------------------------------------------------------------");
-        loggingProvider.info("Detecting the operating system and CPU architecture");
-        loggingProvider.info("------------------------------------------------------------------------");
+    public Detected detect() {
+        return detect(Collections.emptyList());
+    }
 
+    public Detected detect(List<String> classifierWithLikes) {
         final String osName = systemPropertyOperationProvider.getSystemProperty("os.name");
         final String osArch = systemPropertyOperationProvider.getSystemProperty("os.arch");
         final String osVersion = systemPropertyOperationProvider.getSystemProperty("os.version");
 
-        final String detectedName = normalizeOs(osName);
-        final String detectedArch = normalizeArch(osArch);
-        final int detectedBitness = determineBitness(detectedArch);
-
-        setProperty(props, DETECTED_NAME, detectedName);
-        setProperty(props, DETECTED_ARCH, detectedArch);
-        setProperty(props, DETECTED_BITNESS, String.valueOf(detectedBitness));
-
-        final Matcher versionMatcher = VERSION_REGEX.matcher(osVersion);
-        if (versionMatcher.matches()) {
-            setProperty(props, DETECTED_VERSION, versionMatcher.group(1));
-            setProperty(props, DETECTED_VERSION_MAJOR, versionMatcher.group(2));
-            setProperty(props, DETECTED_VERSION_MINOR, versionMatcher.group(3));
-        }
-
-        final String failOnUnknownOS = systemPropertyOperationProvider.getSystemProperty("failOnUnknownOS");
-        if (!"false".equalsIgnoreCase(failOnUnknownOS)) {
-            if (UNKNOWN.equals(detectedName)) {
-                throw new DetectionException("unknown os.name: " + osName);
-            }
-            if (UNKNOWN.equals(detectedArch)) {
-                throw new DetectionException("unknown os.arch: " + osArch);
-            }
-        }
+        final OS detectedName = normalizeOs(osName);
+        final Arch detectedArch = normalizeArch(osArch);
+        final int detectedBitness = determineBitness(detectedArch.name());
 
         // Assume the default classifier, without any os "like" extension.
         final StringBuilder detectedClassifierBuilder = new StringBuilder();
@@ -109,23 +90,10 @@ public class Detector {
         detectedClassifierBuilder.append(detectedArch);
 
         // For Linux systems, add additional properties regarding details of the OS.
-        final LinuxRelease linuxRelease = "linux".equals(detectedName) ? getLinuxRelease() : null;
+        final LinuxRelease linuxRelease = OS.linux != detectedName ? null : getLinuxRelease();
         if (linuxRelease != null) {
-            setProperty(props, DETECTED_RELEASE, linuxRelease.getId());
-            if (linuxRelease.getVersion() != null) {
-                setProperty(props, DETECTED_RELEASE_VERSION, linuxRelease.getVersion());
-            }
-
-            // Add properties for all systems that this OS is "like".
-            for (String like : linuxRelease.getLike()) {
-                final String propKey = DETECTED_RELEASE_LIKE_PREFIX + like;
-                setProperty(props, propKey, "true");
-            }
-
-            // If any of the requested classifier likes are found in the "likes" for this system,
-            // append it to the classifier.
             for (String classifierLike : classifierWithLikes) {
-                if (linuxRelease.getLike().contains(classifierLike)) {
+                if (linuxRelease.like.contains(classifierLike)) {
                     detectedClassifierBuilder.append('-');
                     detectedClassifierBuilder.append(classifierLike);
                     // First one wins.
@@ -133,7 +101,57 @@ public class Detector {
                 }
             }
         }
-        setProperty(props, DETECTED_CLASSIFIER, detectedClassifierBuilder.toString());
+
+        final String detectedClassifier = detectedClassifierBuilder.toString();
+        return new Detected(detectedBitness, osVersion, detectedClassifier, detectedName, detectedArch, linuxRelease);
+    }
+
+    public void detect(Properties props, List<String> classifierWithLikes) {
+        loggingProvider.info("------------------------------------------------------------------------");
+        loggingProvider.info("Detecting the operating system and CPU architecture");
+        loggingProvider.info("------------------------------------------------------------------------");
+
+        final Detected detected = detect(classifierWithLikes);
+
+        setProperty(props, DETECTED_NAME, detected.os.name());
+        setProperty(props, DETECTED_ARCH, detected.arch.name());
+        setProperty(props, DETECTED_BITNESS, String.valueOf(detected.bitness));
+
+        final Matcher versionMatcher = VERSION_REGEX.matcher(detected.version);
+        if (versionMatcher.matches()) {
+            setProperty(props, DETECTED_VERSION, versionMatcher.group(1));
+            setProperty(props, DETECTED_VERSION_MAJOR, versionMatcher.group(2));
+            setProperty(props, DETECTED_VERSION_MINOR, versionMatcher.group(3));
+        }
+
+        final String failOnUnknownOS = systemPropertyOperationProvider.getSystemProperty("failOnUnknownOS");
+        if (!"false".equalsIgnoreCase(failOnUnknownOS)) {
+            if (detected.os.isUnknown()) {
+                final String osName = systemPropertyOperationProvider.getSystemProperty("os.name");
+                throw new DetectionException("unknown os.name: " + osName);
+            }
+            if (detected.arch.isUnknown()) {
+                final String osArch = systemPropertyOperationProvider.getSystemProperty("os.arch");
+                throw new DetectionException("unknown os.arch: " + osArch);
+            }
+        }
+
+        // For Linux systems, add additional properties regarding details of the OS.
+        final LinuxRelease linuxRelease = detected.linuxRelease;
+        if (linuxRelease != null) {
+            setProperty(props, DETECTED_RELEASE, linuxRelease.id);
+            if (linuxRelease.version != null) {
+                setProperty(props, DETECTED_RELEASE_VERSION, linuxRelease.version);
+            }
+
+            // Add properties for all systems that this OS is "like".
+            for (String like : linuxRelease.like) {
+                final String propKey = DETECTED_RELEASE_LIKE_PREFIX + like;
+                setProperty(props, propKey, "true");
+            }
+        }
+
+        setProperty(props, DETECTED_CLASSIFIER, detected.classifier);
     }
 
     private void setProperty(Properties props, String name, String value) {
@@ -142,117 +160,117 @@ public class Detector {
         loggingProvider.info(name + ": " + value);
     }
 
-    private static String normalizeOs(String value) {
+    private static OS normalizeOs(String value) {
         value = normalize(value);
         if (value.startsWith("aix")) {
-            return "aix";
+            return OS.aix;
         }
         if (value.startsWith("hpux")) {
-            return "hpux";
+            return OS.hpux;
         }
         if (value.startsWith("os400")) {
-            // Avoid the names such as os4000
-            if (value.length() <= 5 || !Character.isDigit(value.charAt(5))) {
-                return "os400";
+            // avoid the names such as os4000
+            final boolean cornerCase = value.length() > 5 && Character.isDigit(value.charAt(5));
+            if (!cornerCase) {
+                return OS.os400;
             }
         }
         if (value.startsWith("linux")) {
-            return "linux";
+            return OS.linux;
         }
         if (value.startsWith("mac") || value.startsWith("osx")) {
-            return "osx";
+            return OS.osx;
         }
         if (value.startsWith("freebsd")) {
-            return "freebsd";
+            return OS.freebsd;
         }
         if (value.startsWith("openbsd")) {
-            return "openbsd";
+            return OS.openbsd;
         }
         if (value.startsWith("netbsd")) {
-            return "netbsd";
+            return OS.netbsd;
         }
         if (value.startsWith("solaris") || value.startsWith("sunos")) {
-            return "sunos";
+            return OS.sunos;
         }
         if (value.startsWith("windows")) {
-            return "windows";
+            return OS.windows;
         }
         if (value.startsWith("zos")) {
-            return "zos";
+            return OS.zos;
         }
-
-        return UNKNOWN;
+        return OS.unknown;
     }
 
-    private static String normalizeArch(String value) {
+    private static Arch normalizeArch(String value) {
         value = normalize(value);
         if (value.matches("^(x8664|amd64|ia32e|em64t|x64)$")) {
-            return "x86_64";
+            return Arch.x86_64;
         }
         if (value.matches("^(x8632|x86|i[3-6]86|ia32|x32)$")) {
-            return "x86_32";
+            return Arch.x86_32;
         }
         if (value.matches("^(ia64w?|itanium64)$")) {
-            return "itanium_64";
+            return Arch.itanium_64;
         }
         if ("ia64n".equals(value)) {
-            return "itanium_32";
+            return Arch.itanium_32;
         }
         if (value.matches("^(sparc|sparc32)$")) {
-            return "sparc_32";
+            return Arch.sparc_32;
         }
         if (value.matches("^(sparcv9|sparc64)$")) {
-            return "sparc_64";
+            return Arch.sparc_64;
         }
         if (value.matches("^(arm|arm32)$")) {
-            return "arm_32";
+            return Arch.arm_32;
         }
         if ("aarch64".equals(value)) {
-            return "aarch_64";
+            return Arch.aarch_64;
         }
         if (value.matches("^(mips|mips32)$")) {
-            return "mips_32";
+            return Arch.mips_32;
         }
         if (value.matches("^(mipsel|mips32el)$")) {
-            return "mipsel_32";
+            return Arch.mipsel_32;
         }
         if ("mips64".equals(value)) {
-            return "mips_64";
+            return Arch.mips_64;
         }
         if ("mips64el".equals(value)) {
-            return "mipsel_64";
+            return Arch.mipsel_64;
         }
         if (value.matches("^(ppc|ppc32)$")) {
-            return "ppc_32";
+            return Arch.ppc_32;
         }
         if (value.matches("^(ppcle|ppc32le)$")) {
-            return "ppcle_32";
+            return Arch.ppcle_32;
         }
         if ("ppc64".equals(value)) {
-            return "ppc_64";
+            return Arch.ppc_64;
         }
         if ("ppc64le".equals(value)) {
-            return "ppcle_64";
+            return Arch.ppcle_64;
         }
         if ("s390".equals(value)) {
-            return "s390_32";
+            return Arch.s390_32;
         }
         if ("s390x".equals(value)) {
-            return "s390_64";
+            return Arch.s390_64;
         }
         if (value.matches("^(riscv|riscv32)$")) {
-            return "riscv";
+            return Arch.riscv;
         }
         if ("riscv64".equals(value)) {
-            return "riscv64";
+            return Arch.riscv64;
         }
         if ("e2k".equals(value)) {
-            return "e2k";
+            return Arch.e2k;
         }
         if ("loongarch64".equals(value)) {
-            return "loongarch_64";
+            return Arch.loongarch_64;
         }
-        return UNKNOWN;
+        return Arch.unknown;
     }
 
     private static String normalize(String value) {

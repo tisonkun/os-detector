@@ -16,16 +16,21 @@
 
 package com.tisonkun.os.core;
 
-import java.util.Collection;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+public enum OS {
+    aix,
+    hpux,
+    os400,
+    linux,
+    osx,
+    freebsd,
+    openbsd,
+    netbsd,
+    sunos,
+    windows,
+    zos,
+    unknown;
 
-@AllArgsConstructor
-@EqualsAndHashCode
-@ToString
-public class LinuxRelease {
-    public final String id;
-    public final String version;
-    public final Collection<String> like;
+    public boolean isUnknown() {
+        return this == unknown;
+    }
 }
