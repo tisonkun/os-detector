@@ -2,6 +2,12 @@
 
 A detector for the OS name and architecture, providing a uniform classifier to be used in the names of native artifacts.
 
+This repository is an effort to provide the OS detection logic the same as [os-maven-plugin](https://github.com/trustin/os-maven-plugin/) as a standalone artifact, and redistribute the Maven plugin as well as [the Gradle plugin](https://github.com/google/osdetector-gradle-plugin) (developed by Google) based on such a core lib to align the manner.
+
+I'm seeking for merging these three efforts into one. Check [this issue](https://github.com/trustin/os-maven-plugin/issues/70#issuecomment-1906110062) for more information.
+
+Currently, I'm actively maintaining this repository (lib, plugin-maven and plugin-gradle) for publicly testing, as well as bugfixes + improvements. You can use it as a production-ready solution since the original logics are battle-tested over the years.
+
 ## Programmable
 
 OS detector is provided as a normal module.
