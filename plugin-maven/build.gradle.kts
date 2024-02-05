@@ -24,7 +24,7 @@ plugins {
 }
 
 mavenPlugin {
-    name = "OS Detector Maven Plugin"
+    name = "OS Detector :: Maven Plugin"
     artifactId = "os-detector-maven-plugin"
 }
 
