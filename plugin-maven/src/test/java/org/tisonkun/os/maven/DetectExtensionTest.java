@@ -25,31 +25,30 @@ import org.apache.maven.shared.invoker.DefaultInvoker;
 import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Verify os-detector-maven-plugin can be used as an extension.
  */
 class DetectExtensionTest {
 
-    @Test
-    void testExtension() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"mvn31", "mvn32", "mvn33", "mvn35", "mvn36", "mvn38", "mvn39"})
+    void testExtension(String mavenVersion) throws Exception {
         final Properties properties = new Properties();
         properties.put("os-detector-maven-plugin.version", System.getProperty("project.version"));
 
         final InvocationRequest request = new DefaultInvocationRequest();
         request.setPomFile(new File("src/test/resources/test-project-extension/pom.xml"));
         request.setProperties(properties);
+        request.setBatchMode(true);
         request.setGoals(Collections.singletonList("test"));
 
-        // FIXME :: test more versions
-        final String[] mavenVersions = new String[] {"mvn39"};
-        for (String mavenVersion : mavenVersions) {
-            final Invoker invoker = new DefaultInvoker();
-            invoker.setMavenExecutable(new File(mavenVersion + "/mvnw"));
-            final InvocationResult result = invoker.execute(request);
-            assertThat(result.getExitCode()).isZero();
-            assertThat(result.getExecutionException()).isNull();
-        }
+        final Invoker invoker = new DefaultInvoker();
+        invoker.setMavenExecutable(new File(mavenVersion + "/mvnw"));
+        final InvocationResult result = invoker.execute(request);
+        assertThat(result.getExitCode()).isZero();
+        assertThat(result.getExecutionException()).isNull();
     }
 }
