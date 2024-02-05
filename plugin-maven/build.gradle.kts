@@ -47,6 +47,7 @@ dependencies {
 
 tasks.test {
     dependsOn(tasks.publishToMavenLocal)
+    dependsOn(project(":lib").tasks.publishToMavenLocal)
     systemProperty("project.basedir", projectDir)
     systemProperty("project.version", version)
 }
