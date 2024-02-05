@@ -67,6 +67,8 @@ publishing {
     }
 }
 
-signing {
-    sign(publishing.publications["mavenJava"])
+if (!System.getenv("GITHUB_WORKFLOW").equals("CI", true)) {
+    signing {
+        sign(publishing.publications["mavenJava"])
+    }
 }
