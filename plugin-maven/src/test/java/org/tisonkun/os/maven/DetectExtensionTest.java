@@ -37,17 +37,16 @@ class DetectExtensionTest {
         final Properties properties = new Properties();
         properties.put("os-detector-maven-plugin.version", System.getProperty("project.version"));
 
-        final File basedir = new File(System.getProperty("project.basedir"), "src/test/resources/test-project-extension");
         final InvocationRequest request = new DefaultInvocationRequest();
-        request.setPomFile(new File(basedir, "pom.xml"));
+        request.setPomFile(new File("src/test/resources/test-project-extension/pom.xml"));
         request.setProperties(properties);
         request.setGoals(Collections.singletonList("test"));
 
         // FIXME :: test more versions
-        final String[] mavenVersions = new String[]{"mvn39"};
+        final String[] mavenVersions = new String[] {"mvn39"};
         for (String mavenVersion : mavenVersions) {
             final Invoker invoker = new DefaultInvoker();
-            invoker.setMavenExecutable(new File(basedir, mavenVersion + "/mvnw"));
+            invoker.setMavenExecutable(new File(mavenVersion + "/mvnw"));
             final InvocationResult result = invoker.execute(request);
             assertThat(result.getExitCode()).isZero();
             assertThat(result.getExecutionException()).isNull();
