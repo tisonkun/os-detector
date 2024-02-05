@@ -24,8 +24,8 @@ plugins {
 }
 
 mavenPlugin {
-    name = "OS Detector :: Maven Plugin"
-    artifactId = "os-detector-maven-plugin"
+    name = project.property("artifactName").toString()
+    artifactId = project.property("artifactId").toString()
 }
 
 tasks.withType<GenerateMavenPluginDescriptorTask>().configureEach {
