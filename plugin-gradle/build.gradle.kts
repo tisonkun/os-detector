@@ -77,6 +77,8 @@ publishing {
     }
 }
 
-signing {
-    sign(publishing.publications)
+if (!System.getenv("GITHUB_WORKFLOW").equals("CI", true)) {
+    signing {
+        sign(publishing.publications)
+    }
 }
