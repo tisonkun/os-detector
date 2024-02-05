@@ -37,8 +37,15 @@ tasks.withType<GenerateHelpMojoSourcesTask>().configureEach {
 }
 
 dependencies {
-    compileOnly("org.apache.maven:maven-core:3.9.4")
-    compileOnly("org.apache.maven:maven-plugin-api:3.9.4")
-    compileOnly("org.apache.maven.plugin-tools:maven-plugin-annotations:3.9.0")
+    compileOnly("org.apache.maven:maven-plugin-api:3.9.6")
+    compileOnly("org.apache.maven.plugin-tools:maven-plugin-annotations:3.11.0")
+    implementation("org.apache.maven:maven-core:3.9.6")
+    implementation("org.codehaus.plexus:plexus-utils:4.0.0")
     implementation(project(":lib"))
+    testImplementation("org.apache.maven.shared:maven-invoker:3.2.0")
+}
+
+tasks.test {
+    dependsOn(tasks.publishToMavenLocal)
+    systemProperty("project.version", version)
 }
