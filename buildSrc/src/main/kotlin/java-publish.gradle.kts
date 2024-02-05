@@ -34,7 +34,7 @@ publishing {
             pom {
                 description = project.property("description").toString()
                 name = project.property("artifactName").toString()
-                url = "https://github.com/tisonkun/os-detector/"
+                url = "https://github.com/tisonspieces/os-detector/"
 
                 licenses {
                     license {
@@ -52,9 +52,9 @@ publishing {
                 }
 
                 scm {
-                    connection = "scm:git:https://github.com/tisonkun/os-detector.git"
-                    developerConnection = "scm:git:https://github.com/tisonkun/os-detector.git"
-                    url = "https://github.com/tisonkun/os-detector/"
+                    connection = "scm:git:https://github.com/tisonspieces/os-detector.git"
+                    developerConnection = "scm:git:https://github.com/tisonspieces/os-detector.git"
+                    url = "https://github.com/tisonspieces/os-detector/"
                 }
 
                 if (artifactId.equals("os-detector-maven-plugin")) {
