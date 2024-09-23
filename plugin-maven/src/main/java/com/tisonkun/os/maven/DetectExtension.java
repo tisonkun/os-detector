@@ -69,11 +69,11 @@ import org.codehaus.plexus.util.InterpolationFilterReader;
  */
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = "detect-os")
 public class DetectExtension extends AbstractMavenLifecycleParticipant {
+    private static boolean disable;
+
     /**
      * Describe why.
      */
-    private static boolean disable;
-
     public static void disable() {
         disable = true;
     }
@@ -107,12 +107,11 @@ public class DetectExtension extends AbstractMavenLifecycleParticipant {
         if (disable) {
             return;
         }
-        final Map<String, String> dict = getProperties(session);
 
+        final Map<String, String> dict = getProperties(session);
         // Inject the current session.
         injectSession(session, dict);
-
-        /// Perform the interpolation for the properties of all dependencies.
+        // Perform the interpolation for the properties of all dependencies.
         if (session.getProjects() != null) {
             for (MavenProject p : session.getProjects()) {
                 interpolate(dict, p);
