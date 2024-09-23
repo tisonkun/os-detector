@@ -15,7 +15,7 @@
  */
 
 plugins {
-    id("com.diffplug.spotless") version "6.24.0"
+    id("com.diffplug.spotless") version "6.25.0"
     id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
     id("java")
 }
@@ -47,7 +47,7 @@ subprojects {
             trimTrailingWhitespace()
         }
         java {
-            palantirJavaFormat("2.36.0")
+            palantirJavaFormat("2.50.0")
             importOrder("\\#|")
             removeUnusedImports()
             endWithNewline()

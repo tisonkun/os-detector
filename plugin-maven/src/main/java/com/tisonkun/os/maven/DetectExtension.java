@@ -73,6 +73,11 @@ public class DetectExtension extends AbstractMavenLifecycleParticipant {
     private final Logger logger;
     private final Detector detector;
 
+    /**
+     * Create a Maven extension instance with the platform specific logger.
+     *
+     * @param logger the platform specific logger
+     */
     @Inject
     public DetectExtension(final Logger logger) {
         this.logger = logger;

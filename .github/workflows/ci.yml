@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check license header
-        uses: korandoru/hawkeye@v4
+        uses: korandoru/hawkeye@v5
       - name: Setup Java
         uses: actions/setup-java@v4
         with:

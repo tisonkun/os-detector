@@ -20,7 +20,7 @@ import de.benediktritter.maven.plugin.development.task.GenerateMavenPluginDescri
 plugins {
     id("java-publish")
     // @see https://www.benediktritter.de/maven-plugin-development/
-    id("de.benediktritter.maven-plugin-development") version "0.4.2"
+    id("de.benediktritter.maven-plugin-development") version "0.4.3"
 }
 
 mavenPlugin {
@@ -37,12 +37,13 @@ tasks.withType<GenerateHelpMojoSourcesTask>().configureEach {
 }
 
 dependencies {
-    compileOnly("org.apache.maven:maven-plugin-api:3.9.6")
+    compileOnly("org.apache.maven:maven-api-spi:4.0.0-alpha-13")
+    compileOnly("org.apache.maven:maven-plugin-api:3.9.9")
     compileOnly("org.apache.maven.plugin-tools:maven-plugin-annotations:3.11.0")
-    implementation("org.apache.maven:maven-core:3.9.6")
+    implementation("org.apache.maven:maven-core:3.9.9")
     implementation("org.codehaus.plexus:plexus-utils:4.0.0")
     implementation(project(":lib"))
-    testImplementation("org.apache.maven.shared:maven-invoker:3.2.0")
+    testImplementation("org.apache.maven.shared:maven-invoker:3.3.0")
 }
 
 tasks.test {
