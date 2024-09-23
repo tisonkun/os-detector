@@ -69,6 +69,14 @@ import org.codehaus.plexus.util.InterpolationFilterReader;
  */
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = "detect-os")
 public class DetectExtension extends AbstractMavenLifecycleParticipant {
+    /**
+     * Describe why.
+     */
+    private static boolean disable;
+
+    public static void disable() {
+        disable = true;
+    }
 
     private final Logger logger;
     private final Detector detector;
@@ -95,6 +103,24 @@ public class DetectExtension extends AbstractMavenLifecycleParticipant {
     }
 
     private void injectProperties(MavenSession session) throws MavenExecutionException {
+        // Bail out of disabled
+        if (disable) {
+            return;
+        }
+        final Map<String, String> dict = getProperties(session);
+
+        // Inject the current session.
+        injectSession(session, dict);
+
+        /// Perform the interpolation for the properties of all dependencies.
+        if (session.getProjects() != null) {
+            for (MavenProject p : session.getProjects()) {
+                interpolate(dict, p);
+            }
+        }
+    }
+
+    private Map<String, String> getProperties(MavenSession session) throws MavenExecutionException {
         // Detect the OS and CPU architecture.
         final Properties sessionProps = new Properties();
         sessionProps.putAll(session.getSystemProperties());
@@ -118,15 +144,7 @@ public class DetectExtension extends AbstractMavenLifecycleParticipant {
             }
         }
 
-        // Inject the current session.
-        injectSession(session, dict);
-
-        /// Perform the interpolation for the properties of all dependencies.
-        if (session.getProjects() != null) {
-            for (MavenProject p : session.getProjects()) {
-                interpolate(dict, p);
-            }
-        }
+        return dict;
     }
 
     /**
