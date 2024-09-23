@@ -37,7 +37,6 @@ tasks.withType<GenerateHelpMojoSourcesTask>().configureEach {
 }
 
 dependencies {
-    compileOnly("org.apache.maven:maven-api-spi:4.0.0-alpha-13")
     compileOnly("org.apache.maven:maven-plugin-api:3.9.9")
     compileOnly("org.apache.maven.plugin-tools:maven-plugin-annotations:3.11.0")
     implementation("org.apache.maven:maven-core:3.9.9")

@@ -69,14 +69,6 @@ import org.codehaus.plexus.util.InterpolationFilterReader;
  */
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = "detect-os")
 public class DetectExtension extends AbstractMavenLifecycleParticipant {
-    private static boolean disable;
-
-    /**
-     * Describe why.
-     */
-    public static void disable() {
-        disable = true;
-    }
 
     private final Logger logger;
     private final Detector detector;
@@ -103,11 +95,6 @@ public class DetectExtension extends AbstractMavenLifecycleParticipant {
     }
 
     private void injectProperties(MavenSession session) throws MavenExecutionException {
-        // Bail out of disabled
-        if (disable) {
-            return;
-        }
-
         final Map<String, String> dict = getProperties(session);
         // Inject the current session.
         injectSession(session, dict);

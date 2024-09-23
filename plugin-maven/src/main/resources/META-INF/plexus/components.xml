@@ -25,12 +25,5 @@
             <description/>
             <isolated-realm>false</isolated-realm>
         </component>
-        <component>
-            <role>org.apache.maven.api.spi.PropertyContributor</role>
-            <role-hint>detect-os</role-hint>
-            <implementation>com.tisonkun.os.maven.DetectPropertyContributor</implementation>
-            <description/>
-            <isolated-realm>false</isolated-realm>
-        </component>
     </components>
 </component-set>
