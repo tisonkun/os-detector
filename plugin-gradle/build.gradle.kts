@@ -28,8 +28,8 @@ dependencies {
 
 @Suppress("UnstableApiUsage")
 gradlePlugin {
-    website = "https://github.com/tisonspieces/os-detector/"
-    vcsUrl = "https://github.com/tisonspieces/os-detector.git"
+    website = "https://github.com/tisonkun/os-detector/"
+    vcsUrl = "https://github.com/tisonkun/os-detector.git"
 
     plugins {
         create("osDetectorPlugin") {
@@ -50,7 +50,7 @@ publishing {
             pom {
                 description = project.property("description").toString()
                 name = project.property("artifactName").toString()
-                url = "https://github.com/tisonspieces/os-detector/"
+                url = "https://github.com/tisonkun/os-detector/"
 
                 licenses {
                     license {
@@ -68,9 +68,9 @@ publishing {
                 }
 
                 scm {
-                    connection = "scm:git:https://github.com/tisonspieces/os-detector.git"
-                    developerConnection = "scm:git:https://github.com/tisonspieces/os-detector.git"
-                    url = "https://github.com/tisonspieces/os-detector/"
+                    connection = "scm:git:https://github.com/tisonkun/os-detector.git"
+                    developerConnection = "scm:git:https://github.com/tisonkun/os-detector.git"
+                    url = "https://github.com/tisonkun/os-detector/"
                 }
             }
         }
