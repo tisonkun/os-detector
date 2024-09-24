@@ -34,7 +34,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 class DetectExtensionTest {
 
     @ParameterizedTest
-    @ValueSource(strings = {"mvn31", "mvn32", "mvn33", "mvn35", "mvn36", "mvn38", "mvn39"})
+    @ValueSource(strings = {"mvn31", "mvn32", "mvn33", "mvn35", "mvn36", "mvn38", "mvn39", "mvn40beta4"})
     void testExtension(String mavenVersion) throws Exception {
         final Properties properties = new Properties();
         properties.put("os-detector-maven-plugin.version", System.getProperty("project.version"));

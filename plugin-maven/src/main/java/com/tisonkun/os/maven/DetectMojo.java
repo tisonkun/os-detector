@@ -65,6 +65,11 @@ public class DetectMojo extends AbstractMojo {
     private final Detector detector = new Detector(
             new DefaultSystemPropertyOperations(), new DefaultFileOperations(), message -> getLog().info(message));
 
+    /**
+     * Create a mojo instance to detect OS information.
+     */
+    public DetectMojo() {}
+
     @Override
     public void execute() throws MojoExecutionException {
         try {

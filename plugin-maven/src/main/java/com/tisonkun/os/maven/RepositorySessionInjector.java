@@ -2,6 +2,8 @@ package com.tisonkun.os.maven;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import org.apache.maven.execution.MavenSession;
 import org.codehaus.plexus.logging.Logger;
@@ -28,7 +30,24 @@ final class RepositorySessionInjector {
                 final Field f = cls.getDeclaredField("systemProperties");
                 f.setAccessible(true);
                 repoSessionProps = (Map<String, String>) f.get(repoSession);
-                repoSessionProps.putAll(dict);
+                try {
+                    repoSessionProps.putAll(dict);
+                } catch (Exception ex2) {
+                    // In Maven 4, DefaultCloseableSession uses an immutable map
+                    // but DefaultRepositorySystemSession may also have an immutable map
+                    repoSessionProps = new HashMap<>(repoSessionProps);
+                    repoSessionProps.putAll(dict);
+                    repoSessionProps = Collections.unmodifiableMap(repoSessionProps);
+                    f.set(repoSession, repoSessionProps);
+                    try {
+                        // This is to support DefaultRepositorySystemSession
+                        final Field fv = cls.getDeclaredField("systemPropertiesView");
+                        fv.setAccessible(true);
+                        fv.set(repoSession, repoSessionProps);
+                    } catch (Exception ex3) {
+                        // ignore
+                    }
+                }
             }
         } catch (Throwable t) {
             logger.warn("Failed to inject repository session properties.", t);

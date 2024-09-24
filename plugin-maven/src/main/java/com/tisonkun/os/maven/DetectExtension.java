@@ -73,6 +73,11 @@ public class DetectExtension extends AbstractMavenLifecycleParticipant {
     private final Logger logger;
     private final Detector detector;
 
+    /**
+     * Create a Maven extension instance with the platform specific logger.
+     *
+     * @param logger the platform specific logger
+     */
     @Inject
     public DetectExtension(final Logger logger) {
         this.logger = logger;
@@ -90,6 +95,18 @@ public class DetectExtension extends AbstractMavenLifecycleParticipant {
     }
 
     private void injectProperties(MavenSession session) throws MavenExecutionException {
+        final Map<String, String> dict = getProperties(session);
+        // Inject the current session.
+        injectSession(session, dict);
+        // Perform the interpolation for the properties of all dependencies.
+        if (session.getProjects() != null) {
+            for (MavenProject p : session.getProjects()) {
+                interpolate(dict, p);
+            }
+        }
+    }
+
+    private Map<String, String> getProperties(MavenSession session) throws MavenExecutionException {
         // Detect the OS and CPU architecture.
         final Properties sessionProps = new Properties();
         sessionProps.putAll(session.getSystemProperties());
@@ -113,15 +130,7 @@ public class DetectExtension extends AbstractMavenLifecycleParticipant {
             }
         }
 
-        // Inject the current session.
-        injectSession(session, dict);
-
-        /// Perform the interpolation for the properties of all dependencies.
-        if (session.getProjects() != null) {
-            for (MavenProject p : session.getProjects()) {
-                interpolate(dict, p);
-            }
-        }
+        return dict;
     }
 
     /**
