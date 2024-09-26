@@ -24,6 +24,7 @@ excludes = [
     "plugin-gradle/src/main/java/com/tisonkun/os/gradle/OSDetector.java",
     "plugin-maven/src/main/java/com/tisonkun/os/maven/DetectExtension.java",
     "plugin-maven/src/main/java/com/tisonkun/os/maven/DetectMojo.java",
+    "plugin-maven/src/main/java/com/tisonkun/os/maven/DetectPropertyContributor.java",
     "plugin-maven/src/main/java/com/tisonkun/os/maven/RepositorySessionInjector.java",
 ]
 
