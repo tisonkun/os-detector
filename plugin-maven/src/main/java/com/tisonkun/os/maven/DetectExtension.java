@@ -70,6 +70,18 @@ import org.codehaus.plexus.util.InterpolationFilterReader;
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = "detect-os")
 public class DetectExtension extends AbstractMavenLifecycleParticipant {
 
+    private static boolean disable;
+
+    /**
+     * When running in Maven 4, the interpolation of existing projects can be very slow.
+     * This allows disabling the interpolation of existing projects, as this Maven 4
+     * extension provides the properties early enough so that they are available for
+     * interpolation.
+     */
+    public static void disable() {
+        disable = true;
+    }
+
     private final Logger logger;
     private final Detector detector;
 
@@ -95,6 +107,9 @@ public class DetectExtension extends AbstractMavenLifecycleParticipant {
     }
 
     private void injectProperties(MavenSession session) throws MavenExecutionException {
+        if (disable) {
+            return;
+        }
         final Map<String, String> dict = getProperties(session);
         // Inject the current session.
         injectSession(session, dict);
