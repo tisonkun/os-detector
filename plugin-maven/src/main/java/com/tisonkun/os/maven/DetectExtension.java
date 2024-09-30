@@ -99,7 +99,8 @@ public class DetectExtension extends AbstractMavenLifecycleParticipant {
     @Override
     public void afterSessionStart(MavenSession session) throws MavenExecutionException {
         if (!disable) {
-            logger.info("The os-detector Maven 3 extension is registered, OS and CPU architecture properties will be provided.");
+            logger.info(
+                    "The os-detector Maven 3 extension is registered, OS and CPU architecture properties will be provided.");
         }
         injectProperties(session);
     }
