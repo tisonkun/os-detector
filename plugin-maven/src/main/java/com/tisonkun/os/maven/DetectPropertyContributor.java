@@ -47,7 +47,7 @@ public class DetectPropertyContributor implements PropertyContributor {
 
     @Override
     public void contribute(Map<String, String> map) {
-        logger.info("The os-detector extension is registered, OS and CPU architecture properties will be provided.");
+        logger.info("The os-detector Maven 4 extension is registered, OS and CPU architecture properties will be provided.");
         DetectExtension.disable();
 
         final Properties props = new Properties();
