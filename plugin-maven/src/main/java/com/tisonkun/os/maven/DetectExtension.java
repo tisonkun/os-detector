@@ -93,7 +93,7 @@ public class DetectExtension extends AbstractMavenLifecycleParticipant {
     @Inject
     public DetectExtension(final Logger logger) {
         this.logger = logger;
-        this.detector = new Detector(new DefaultSystemPropertyOperations(), new DefaultFileOperations(), logger::info);
+        this.detector = new Detector(new DefaultSystemPropertyOperations(), new DefaultFileOperations(), logger::debug);
     }
 
     @Override
