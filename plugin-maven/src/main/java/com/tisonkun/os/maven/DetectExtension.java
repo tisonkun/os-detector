@@ -93,11 +93,15 @@ public class DetectExtension extends AbstractMavenLifecycleParticipant {
     @Inject
     public DetectExtension(final Logger logger) {
         this.logger = logger;
-        this.detector = new Detector(new DefaultSystemPropertyOperations(), new DefaultFileOperations(), logger::info);
+        this.detector = new Detector(new DefaultSystemPropertyOperations(), new DefaultFileOperations(), logger::debug);
     }
 
     @Override
     public void afterSessionStart(MavenSession session) throws MavenExecutionException {
+        if (!disable) {
+            logger.info(
+                    "The os-detector Maven 3 extension is registered, OS and CPU architecture properties will be provided.");
+        }
         injectProperties(session);
     }
 
