@@ -67,8 +67,12 @@ publishing {
     }
 }
 
-if (!System.getenv("GITHUB_WORKFLOW").equals("CI", true)) {
-    signing {
-        sign(publishing.publications["mavenJava"])
+signing {
+    setRequired {
+        val releaseVersion = !version.toString().endsWith("-SNAPSHOT")
+        // signing is required if this is a release version and the artifacts are to be published
+        // do not use hasTask() as this require realization of the tasks that maybe are not necessary
+        releaseVersion && gradle.taskGraph.allTasks.any { it is PublishToMavenRepository }
     }
+    sign(publishing.publications["mavenJava"])
 }
