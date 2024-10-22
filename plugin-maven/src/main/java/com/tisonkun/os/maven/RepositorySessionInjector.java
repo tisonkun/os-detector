@@ -21,7 +21,7 @@ final class RepositorySessionInjector {
             // Both interfaces have getSystemProperties() accessor method that returns Map<String, String>.
             final Object repoSession = session.getRepositorySession();
             final Class<?> cls = repoSession.getClass();
-            final Method getSystemPropertiesMethod = cls.getDeclaredMethod("getSystemProperties");
+            final Method getSystemPropertiesMethod = cls.getMethod("getSystemProperties");
             repoSessionProps = (Map<String, String>) getSystemPropertiesMethod.invoke(repoSession);
             try {
                 repoSessionProps.putAll(dict);
