@@ -16,7 +16,7 @@
 
 package com.tisonkun.os.core;
 
-import java.util.Collection;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -27,5 +27,5 @@ import lombok.ToString;
 public class LinuxRelease {
     public final String id;
     public final String version;
-    public final Collection<String> like;
+    public final List<String> likes;
 }

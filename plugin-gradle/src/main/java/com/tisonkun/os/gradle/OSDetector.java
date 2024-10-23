@@ -25,8 +25,6 @@ import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +43,6 @@ public abstract class OSDetector {
 
     @Inject
     public abstract ProjectLayout getProjectLayout();
-
-    private final List<String> classifierWithLikes = new ArrayList<>();
 
     @SuppressWarnings("FieldCanBeLocal")
     private final Project project;
@@ -78,24 +74,13 @@ public abstract class OSDetector {
         return new Release(impl);
     }
 
-    public synchronized void setClassifierWithLikes(List<String> classifierWithLikes) {
-        if (impl != null) {
-            throw new IllegalStateException("classifierWithLikes must be set before osdetector is read.");
-        }
-        this.classifierWithLikes.clear();
-        this.classifierWithLikes.addAll(classifierWithLikes);
-    }
-
     private synchronized Impl getImpl() {
         if (impl == null) {
             if (GradleVersion.current().compareTo(GradleVersion.version("6.5")) >= 0) {
                 impl = new Impl(
-                        classifierWithLikes,
-                        new ConfigurationTimeSafeSystemPropertyOperations(),
-                        new ConfigurationTimeSafeFileOperations());
+                        new ConfigurationTimeSafeSystemPropertyOperations(), new ConfigurationTimeSafeFileOperations());
             } else {
-                impl = new Impl(
-                        classifierWithLikes, new DefaultSystemPropertyOperations(), new DefaultFileOperations());
+                impl = new Impl(new DefaultSystemPropertyOperations(), new DefaultFileOperations());
             }
         }
         return impl;
@@ -137,12 +122,9 @@ public abstract class OSDetector {
     private static class Impl {
         private final Properties detectedProperties = new Properties();
 
-        private Impl(
-                List<String> classifierWithLikes,
-                SystemPropertyOperationProvider sysPropOps,
-                FileOperationProvider fsOps) {
+        private Impl(SystemPropertyOperationProvider sysPropOps, FileOperationProvider fsOps) {
             final Detector detector = new Detector(sysPropOps, fsOps, log::info);
-            detector.detect(detectedProperties, classifierWithLikes);
+            detector.detect(detectedProperties);
         }
     }
 
@@ -156,7 +138,9 @@ public abstract class OSDetector {
         }
     }
 
-    /** Provides system property operations compatible with Gradle configuration cache. */
+    /**
+     * Provides system property operations compatible with Gradle configuration cache.
+     */
     private final class ConfigurationTimeSafeSystemPropertyOperations implements SystemPropertyOperationProvider {
         @Override
         public String getSystemProperty(String name) {
@@ -177,7 +161,9 @@ public abstract class OSDetector {
         }
     }
 
-    /** Provides filesystem operations compatible with Gradle configuration cache. */
+    /**
+     * Provides filesystem operations compatible with Gradle configuration cache.
+     */
     private final class ConfigurationTimeSafeFileOperations implements FileOperationProvider {
         @Override
         public InputStream readFile(String fileName) throws IOException {

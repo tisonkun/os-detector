@@ -17,7 +17,6 @@
 package com.tisonkun.os.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import java.util.Collections;
 import java.util.Properties;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +25,7 @@ class DetectorTest {
     void testDetectProperties() {
         final Properties properties = new Properties();
         final Detector detector = new Detector(System.out::println);
-        detector.detect(properties, Collections.emptyList());
+        detector.detect(properties);
         assertThat(properties)
                 .containsKeys(
                         "os.detected.name",

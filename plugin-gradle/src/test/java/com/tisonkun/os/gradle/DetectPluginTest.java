@@ -17,9 +17,6 @@
 package com.tisonkun.os.gradle;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import java.util.ArrayList;
-import java.util.Collections;
 import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
@@ -47,25 +44,5 @@ class DetectPluginTest {
         } else {
             assertThat(detector.getRelease()).isNull();
         }
-    }
-
-    @Test
-    void setClassifierWithLikes() {
-        final Project project = ProjectBuilder.builder().build();
-        project.apply(action -> action.plugin("com.tisonkun.osdetector"));
-
-        final OSDetector detector = (OSDetector) project.getExtensions().getByName("osdetector");
-        detector.setClassifierWithLikes(new ArrayList<String>() {
-            {
-                add("debian");
-                add("fedora");
-            }
-        });
-        assertThat(detector.getOs()).isNotNull();
-        assertThat(detector.getArch()).isNotNull();
-        System.err.println("classifier=" + detector.getClassifier());
-
-        assertThatThrownBy(() -> detector.setClassifierWithLikes(Collections.singletonList("debian")))
-                .isExactlyInstanceOf(IllegalStateException.class);
     }
 }

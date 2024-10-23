@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import javax.inject.Inject;
@@ -56,16 +55,7 @@ public class DetectPropertyContributor implements PropertyContributor {
 
         final Detector detector =
                 new Detector(new SimpleSystemPropertyOperations(map), new SimpleFileOperations(), logger::debug);
-        detector.detect(props, getClassifierWithLikes(map));
-    }
-
-    /**
-     * Inspects the session's user and project properties for the {@link
-     * DetectMojo#CLASSIFIER_WITH_LIKES_PROPERTY} and separates the property into a list.
-     */
-    private static List<String> getClassifierWithLikes(Map<String, String> map) {
-        // Check to see if the project defined the
-        return DetectMojo.getClassifierWithLikes(map.get(DetectMojo.CLASSIFIER_WITH_LIKES_PROPERTY));
+        detector.detect(props);
     }
 
     private static class SimpleSystemPropertyOperations implements SystemPropertyOperationProvider {
