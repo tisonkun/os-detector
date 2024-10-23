@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import javax.inject.Inject;
@@ -131,7 +130,7 @@ public class DetectExtension extends AbstractMavenLifecycleParticipant {
         sessionProps.putAll(session.getSystemProperties());
         sessionProps.putAll(session.getUserProperties());
         try {
-            detector.detect(sessionProps, getClassifierWithLikes(session));
+            detector.detect(sessionProps);
         } catch (DetectionException e) {
             throw new MavenExecutionException(
                     e.getMessage(), session.getCurrentProject().getFile());
@@ -152,22 +151,6 @@ public class DetectExtension extends AbstractMavenLifecycleParticipant {
         return dict;
     }
 
-    /**
-     * Inspects the session's user and project properties for the {@link
-     * DetectMojo#CLASSIFIER_WITH_LIKES_PROPERTY} and separates the property into a list.
-     */
-    private static List<String> getClassifierWithLikes(MavenSession session) {
-        // Check to see if the project defined the
-        final Properties props = new Properties();
-        props.putAll(session.getUserProperties());
-
-        if (session.getCurrentProject() != null) {
-            props.putAll(session.getCurrentProject().getProperties());
-        }
-
-        return DetectMojo.getClassifierWithLikes(props.getProperty(DetectMojo.CLASSIFIER_WITH_LIKES_PROPERTY));
-    }
-
     private void injectSession(MavenSession session, Map<String, String> dict) {
         final Properties sessionExecProps = session.getSystemProperties();
         sessionExecProps.setProperty(Detector.DETECTED_NAME, String.valueOf(dict.get(Detector.DETECTED_NAME)));
@@ -182,7 +165,7 @@ public class DetectExtension extends AbstractMavenLifecycleParticipant {
 
         // Work around the 'NoClassDefFoundError' or 'ClassNotFoundException' related with Aether in IntelliJ IDEA.
         for (StackTraceElement e : new Exception().getStackTrace()) {
-            if (String.valueOf(e.getClassName()).startsWith("org.jetbrains.idea.maven")) {
+            if (e.getClassName().startsWith("org.jetbrains.idea.maven")) {
                 return;
             }
         }

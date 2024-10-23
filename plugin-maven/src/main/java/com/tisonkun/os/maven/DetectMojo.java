@@ -20,9 +20,6 @@ import com.tisonkun.os.core.DefaultFileOperations;
 import com.tisonkun.os.core.DefaultSystemPropertyOperations;
 import com.tisonkun.os.core.DetectionException;
 import com.tisonkun.os.core.Detector;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -54,13 +51,8 @@ import org.apache.maven.project.MavenProject;
  */
 @Mojo(name = "detect", defaultPhase = LifecyclePhase.VALIDATE, threadSafe = true)
 public class DetectMojo extends AbstractMojo {
-    static final String CLASSIFIER_WITH_LIKES_PROPERTY = "os.detection.classifierWithLikes";
-
     @Parameter(defaultValue = "${project}", readonly = true)
     private MavenProject project;
-
-    @Parameter(property = CLASSIFIER_WITH_LIKES_PROPERTY, defaultValue = "${" + CLASSIFIER_WITH_LIKES_PROPERTY + '}')
-    private String classifierWithLikes;
 
     private final Detector detector = new Detector(
             new DefaultSystemPropertyOperations(), new DefaultFileOperations(), message -> getLog().info(message));
@@ -73,32 +65,9 @@ public class DetectMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException {
         try {
-            detector.detect(project.getProperties(), getClassifierWithLikes(classifierWithLikes));
+            detector.detect(project.getProperties());
         } catch (DetectionException e) {
             throw new MojoExecutionException(e.getMessage());
         }
-    }
-
-    /**
-     * Takes a comma-separated value of os "likes" to be included in the generated classifier and
-     * returns them as a list.
-     *
-     * @param propertyValue the value of the {@link #CLASSIFIER_WITH_LIKES_PROPERTY} property.
-     * @return the value as a list of entries.
-     */
-    public static List<String> getClassifierWithLikes(String propertyValue) {
-        if (propertyValue == null) {
-            return Collections.emptyList();
-        }
-
-        final String[] parts = propertyValue.split(",");
-        final List<String> likes = new ArrayList<>(parts.length);
-        for (String part : parts) {
-            part = part.trim();
-            if (!part.isEmpty()) {
-                likes.add(part);
-            }
-        }
-        return likes;
     }
 }

@@ -31,6 +31,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Detector {
     public static final String DETECTED_NAME = "os.detected.name";
@@ -71,10 +72,6 @@ public class Detector {
     }
 
     public Detected detect() {
-        return detect(Collections.emptyList());
-    }
-
-    public Detected detect(List<String> classifierWithLikes) {
         final String osName = systemPropertyOperationProvider.getSystemProperty("os.name");
         final String osArch = systemPropertyOperationProvider.getSystemProperty("os.arch");
         final String osVersion = systemPropertyOperationProvider.getSystemProperty("os.version");
@@ -82,36 +79,18 @@ public class Detector {
         final OS detectedName = normalizeOs(osName);
         final Arch detectedArch = normalizeArch(osArch);
         final int detectedBitness = determineBitness(detectedArch.name());
-
-        // Assume the default classifier, without any os "like" extension.
-        final StringBuilder detectedClassifierBuilder = new StringBuilder();
-        detectedClassifierBuilder.append(detectedName);
-        detectedClassifierBuilder.append('-');
-        detectedClassifierBuilder.append(detectedArch);
-
-        // For Linux systems, add additional properties regarding details of the OS.
+        final String detectedClassifier = String.valueOf(detectedName) + '-' + detectedArch;
         final LinuxRelease linuxRelease = OS.linux != detectedName ? null : getLinuxRelease();
-        if (linuxRelease != null) {
-            for (String classifierLike : classifierWithLikes) {
-                if (linuxRelease.like.contains(classifierLike)) {
-                    detectedClassifierBuilder.append('-');
-                    detectedClassifierBuilder.append(classifierLike);
-                    // First one wins.
-                    break;
-                }
-            }
-        }
 
-        final String detectedClassifier = detectedClassifierBuilder.toString();
         return new Detected(detectedBitness, osVersion, detectedClassifier, detectedName, detectedArch, linuxRelease);
     }
 
-    public void detect(Properties props, List<String> classifierWithLikes) {
+    public void detect(Properties props) {
         loggingProvider.info("------------------------------------------------------------------------");
         loggingProvider.info("Detecting the operating system and CPU architecture");
         loggingProvider.info("------------------------------------------------------------------------");
 
-        final Detected detected = detect(classifierWithLikes);
+        final Detected detected = detect();
 
         setProperty(props, DETECTED_NAME, detected.os.name());
         setProperty(props, DETECTED_ARCH, detected.arch.name());
@@ -145,7 +124,7 @@ public class Detector {
             }
 
             // Add properties for all systems that this OS is "like".
-            for (String like : linuxRelease.like) {
+            for (String like : linuxRelease.likes) {
                 final String propKey = DETECTED_RELEASE_LIKE_PREFIX + like;
                 setProperty(props, propKey, "true");
             }
@@ -360,7 +339,8 @@ public class Detector {
             }
 
             if (id != null) {
-                return new LinuxRelease(id, version, likeSet);
+                final List<String> likes = likeSet.stream().sorted().collect(Collectors.toList());
+                return new LinuxRelease(id, version, likes);
             }
         } catch (IOException ignored) {
             // Just absorb. Don't treat failure to read /etc/os-release as an error.
@@ -404,10 +384,10 @@ public class Detector {
                     version = versionMatcher.group(1);
                 }
 
-                final Set<String> likeSet = new LinkedHashSet<String>(Arrays.asList(DEFAULT_REDHAT_VARIANTS));
+                final Set<String> likeSet = new LinkedHashSet<>(Arrays.asList(DEFAULT_REDHAT_VARIANTS));
                 likeSet.add(id);
-
-                return new LinuxRelease(id, version, likeSet);
+                final List<String> likes = likeSet.stream().sorted().collect(Collectors.toList());
+                return new LinuxRelease(id, version, likes);
             }
         } catch (IOException ignored) {
             // Just absorb. Don't treat failure to read /etc/os-release as an error.
