@@ -81,10 +81,10 @@ plugins {
 
 The plugin creates osdetector extension in your project, through which you can access the following attributes:
 
-* `osdetector.os`: normalized OS name
-* `osdetector.arch`: architecture
-* `osdetector.classifier`: classifier, which is `osdetector.os + '-' + osdetector.arch`, e.g., `linux-x86_64`
-* `osdetector.release`: only available if `osdetector.os` is `linux`. `null` on non-linux systems. It provides additional information about the linux release:
+* `os.detected.name`: normalized OS name
+* `os.detected.arch`: architecture
+* `os.detected.classifier`: classifier, which is `os.detected.name + '-' + os.detected.arch`, e.g., `linux-x86_64`
+* `os.detected.release`: only available if `os.detected.name` is `linux`. `null` on non-linux systems. It provides additional information about the linux release:
   * `id`: the ID for the linux release
   * `version`: the version ID for this linux release
   * `isLike(baseRelease)`: `true` if this release is a variant of the given base release. For example, ubuntu is a variant of debian, so on a debian or ubuntu system `isLike('debian')` returns `true`.
